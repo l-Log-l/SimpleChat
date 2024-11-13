@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "simplechat",
+  "version": "${version}",
+  "name": "SimpleChat",
+  "description": "A simple mod for setting up a chat on your server",
+  "authors": [
+    "vetustus, AzureDoom, rantuhin, stark",
+    "Log"
+  ],
+  "contact": {
+    "issues": "https://github.com/rantuhin/SimpleChat/issues",
+    "sources": "https://github.com/rantuhin/SimpleChat"
+  },
+  "license": "MIT",
+  "icon": "assets/simplechat/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "me.vetustus.server.simplechat.SimpleChat"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.16.6",
+    "minecraft": ">=1.21",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
