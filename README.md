@@ -1,6 +1,7 @@
 # SimpleChat (fork++)
 
-![Mod version badge](https://img.shields.io/badge/game_version-1,21-blue)
+![Modrinth downloads badge](https://img.shields.io/modrinth/dt/PXaxqCH3)
+![Modrinth versions badge](https://img.shields.io/modrinth/game-versions/PXaxqCH3)
 ![java 17 badge](https://img.shields.io/badge/java-21+-orange?logo=java)
 
 ### This fork was created because the main project is [no longer maintained](https://github.com/cayennemc/SimpleChat/issues/11).
