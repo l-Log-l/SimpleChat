@@ -6,11 +6,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+
 import java.nio.file.Files;
+
 import java.util.List;
 import java.util.Objects;
 
 import com.google.gson.Gson;
+
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
@@ -35,8 +38,6 @@ public class SimpleChat implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
-
         try {
             loadConfig();
             LOGGER.info("The config is saved!");
@@ -52,8 +53,6 @@ public class SimpleChat implements ModInitializer {
 
             if (!config.isChatModEnabled())
                 return true;
-
-
 
             boolean isGlobalMessage = false;
             boolean isWorldMessage = false;
@@ -86,75 +85,51 @@ public class SimpleChat implements ModInitializer {
             if (config.isChatColorsEnabled())
                 stringMessage = translateChatColors('&', stringMessage);
 
-
-            //            Text resultMessage = literal(stringMessage);
             Text resultMessage = Placeholders.parseText(TextParserUtils.formatText(stringMessage), PlaceholderContext.of(sender));
 
             int isPlayerLocalFound = 0;
 
-//
-
-
-
             List<ServerPlayerEntity> players = Objects.requireNonNull(sender.getServer(), "The server cannot be null.")
                     .getPlayerManager().getPlayerList();
             for (ServerPlayerEntity p : players) {
-//                LOGGER.error("-----------------------------------");
-//                LOGGER.error(p.getName().toString());
-//                LOGGER.error(config.isGlobalChatEnabled()+" / "+ isGlobalMessage);
-//                LOGGER.error(config.isWorldChatEnabled()+" / "+ isWorldMessage);
-//                LOGGER.error(config.isWorldChatEnabled()+" / "+ isWorldMessage);
-//                LOGGER.error(p.squaredDistanceTo(sender)+" | "+  config.getChatRange());
-//                LOGGER.error(p.squaredDistanceTo(sender)+" | "+  config.getChatRange());
-//                LOGGER.error("-----------------------------------");
                 if (config.isGlobalChatEnabled()) {
                     if (isGlobalMessage) {
                         p.sendMessage(resultMessage, false);
-
                     } else if (isWorldMessage && config.isWorldChatEnabled()) {
-//                        p.world.getDimensionKey().getValue();
                         if (p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
                             p.sendMessage(resultMessage, false);
-
                         }
                     } else if (p.squaredDistanceTo(sender) <= config.getChatRange() || p.getUuid() == sender.getUuid()) {
-                            p.sendMessage(resultMessage, false);
-                            LOGGER.debug(p.squaredDistanceTo(sender)+"/"+config.getChatRange()+ " | "+isGlobalMessage+" | "+resultMessage.toString());
-                            isPlayerLocalFound++;
-
-
+                        p.sendMessage(resultMessage, false);
+                        LOGGER.debug(p.squaredDistanceTo(sender)+"/"+config.getChatRange()+ " | "+isGlobalMessage+" | "+resultMessage.toString());
+                        isPlayerLocalFound++;
                     }
                 } else if (config.isWorldChatEnabled()) {
                     if (isWorldMessage) {
                         if (p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
                             p.sendMessage(resultMessage, false);
-
                         }
                     } else if (p.squaredDistanceTo(sender) <= config.getChatRange() && p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
-                            p.sendMessage(resultMessage, false);
-
-                            isPlayerLocalFound++;
-
+                        p.sendMessage(resultMessage, false);
+                        isPlayerLocalFound++;
                     }
                 } else {
                     p.sendMessage(resultMessage, false);
-
-
                 }
-
-
             }
+
+
 
             if (isPlayerLocalFound <= 1 && !isGlobalMessage && !isWorldMessage) {
                 String noPlayerNearbyText = config.getNoPlayerNearbyText();
                 Text noPlayerNearbyTextResult = Text.literal(translateChatColors('&', noPlayerNearbyText));
                 sender.sendMessage(noPlayerNearbyTextResult, config.noPlayerNearbyActionBar());
-                LOGGER.error("7");
             }
 
             LOGGER.info(stringMessage);
-            return false; // Отменяем стандартное сообщение
+            return false;
         });
+
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(CommandManager.literal("simplechat").executes(context -> {
                     if (context.getSource().hasPermissionLevel(1)) {
@@ -171,6 +146,7 @@ public class SimpleChat implements ModInitializer {
                     return 1;
                 })));
     }
+
     private void loadConfig() throws IOException {
         File configFile = new File(ChatConfig.CONFIG_PATH);
         File configFolder = new File("config/");
@@ -188,6 +164,4 @@ public class SimpleChat implements ModInitializer {
             e.printStackTrace();
         }
     }
-
-
 }

@@ -13,7 +13,7 @@ Works even in a single player game.
 
 Just use `!<message>` for global chat or `#<message>` for world chat!
 
-![Example image showing formatted chat messages](https://i.imgur.com/0DPfadW.png)
+![Example image showing formatted chat messages](https://i.imgur.com/aWeZ1DV.png)
 ## Features
 - FTB Teams integration _(no tested)_
 - LuckPerms integration _(tested 5.4)_
@@ -42,11 +42,11 @@ The configuration is located in `<game or server directory>/config/simplechat.js
   "enable_global_chat": true,
   "enable_world_chat": false,
   "enable_chat_colors": false,
-  "local_chat_format": "%player%&7:&r &7%message%",
-  "global_chat_format": "&8[&2G&8] &r%player%&7:&r &e%message%",
-  "world_chat_format": "&8[&9W&8] &r%player%&7:&r &e%message%",
+  "local_chat_format": "&7%ftbteam%&r%lp_prefix%&r%player%&7:&r &7%message%",
+  "global_chat_format": "&8[&2G&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%",
+  "world_chat_format": "&8[&9W&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%",
   "no_players_nearby_text": "&fNo players nearby. Please use &e!<message> &ffor global chat.",
-  "no_players_nearby_action_bar": true,
+  "no_players_nearby_action_bar": false,
   "chat_range": 100
 }
 ```
@@ -60,7 +60,7 @@ You can use the placeholder `%player%` to specify the player's nickname and the 
 You can reload the configuration without restarting the server or the game using the `/simplechat` command (requires [permission level](https://minecraft.fandom.com/wiki/Server.properties#op-permission-level) 1 or more).
 
 ## NO API
-I am removing [`me.vetustus.server.simplechat.api.event.PlayerChatCallback`](src/main/java/me/vetustus/server/simplechat/api/event/PlayerChatCallback.java) as I didn't see the need for it, and instead of porting it to 1.21, I am using the standard event `net.fabricmc.fabric.api.message.v1.ServerMessageEvents` `ALLOW_CHAT_MESSAGE`.
+I am removing `me.vetustus.server.simplechat.api.event.PlayerChatCallback` as I didn't see the need for it, and instead of porting it to 1.21, I am using the standard event `net.fabricmc.fabric.api.message.v1.ServerMessageEvents` `ALLOW_CHAT_MESSAGE`.
 
 ## License
 The MIT license is used.
