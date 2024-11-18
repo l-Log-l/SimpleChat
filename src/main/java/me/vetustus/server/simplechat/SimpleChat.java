@@ -42,7 +42,7 @@ public class SimpleChat implements ModInitializer {
             loadConfig();
             LOGGER.info("The config is saved!");
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e.toString());
         }
 
         boolean ftbteams = FabricLoader.getInstance().isModLoaded("ftbteams");
@@ -138,7 +138,7 @@ public class SimpleChat implements ModInitializer {
                             context.getSource().sendMessage(Text.literal("Settings are reloaded!"));
                         } catch (IOException e) {
                             context.getSource().sendMessage(Text.literal("An error occurred while reloading the settings (see the console)!"));
-                            e.printStackTrace();
+                            LOGGER.error(e.toString());
                         }
                     } else {
                         context.getSource().sendError(Text.literal("You don't have the right to do this! If you think this is an error, contact your server administrator."));
@@ -161,7 +161,7 @@ public class SimpleChat implements ModInitializer {
             config = new Gson().fromJson(new FileReader(ChatConfig.CONFIG_PATH), ChatConfig.class);
         } catch (FileNotFoundException e) {
             config = new ChatConfig();
-            e.printStackTrace();
+            LOGGER.error(e.toString());
         }
     }
 }

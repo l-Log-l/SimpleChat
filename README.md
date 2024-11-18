@@ -20,7 +20,6 @@ Just use `!<message>` for global chat or `#<message>` for world chat!
 - Global, world and local chat (you can turn it off)
 - Color chat (you can turn it off)
 - Reloading the configuration with the command
-- For developers: Player chat event
 
 ## Configuration
 The configuration is located in `<game or server directory>/config/simplechat.json`.
