@@ -39,27 +39,29 @@ public class SimpleChat implements ModInitializer {
             LOGGER.error(e.toString());
         }
 
-        boolean ftbteams = FabricLoader.getInstance().isModLoaded("ftbteams");
-        boolean luckperms = FabricLoader.getInstance().isModLoaded("luckperms");
-        boolean vanish = FabricLoader.getInstance().isModLoaded("melius-vanish");
+        boolean isftbteams = FabricLoader.getInstance().isModLoaded("ftbteams");
+        boolean isluckperms = FabricLoader.getInstance().isModLoaded("luckperms");
+        boolean isvanish = FabricLoader.getInstance().isModLoaded("melius-vanish");
 
         ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((message, sender, params) -> {
             if (sender.getServer() != null && sender.getServer().isSingleplayer()) {
                 LOGGER.error("Single mode detected, the mod will be disabled.");
                 return true;
             }
-            boolean isSenderVanished = vanish && VanishAPI.isVanished(sender);
-            if (isSenderVanished && ConfigManager.vanish().disableChat) {
-                sender.sendMessage(TextParserUtils.formatText("You cannot chat while vanished."),false);
-                return false;
-            }
             String originalMessage = message.getContent().getString();
 
             if (!config.isChatModEnabled())
                 return true;
-
+            boolean isSenderVanished = false;
             boolean isGlobalMessage = false;
             boolean isWorldMessage = false;
+            if (isvanish) {
+                isSenderVanished = VanishAPI.isVanished(sender);
+                if (isSenderVanished && ConfigManager.vanish().disableChat) {
+                    sender.sendMessage(TextParserUtils.formatText("You cannot chat while vanished."), false);
+                    return false;
+                }
+            }
             String chatFormat = config.getLocalChatFormat();
             if (config.isGlobalChatEnabled()) {
                 if (originalMessage.startsWith("!")) {
@@ -77,10 +79,10 @@ public class SimpleChat implements ModInitializer {
             }
             String prepareStringMessage = chatFormat
                     .replaceAll("%player%", sender.getName().getString())
-                    .replaceAll("%ftbteam%", ftbteams ? FTBTeamsIntegration.getTeam(sender) : "")
-                    .replaceAll("%lp_group%", luckperms ? translateChatColors('&', LuckPermsIntegration.getPrimaryGroup(sender)) : "")
-                    .replaceAll("%lp_prefix%", luckperms ? translateChatColors('&', LuckPermsIntegration.getPrefix(sender)) : "")
-                    .replaceAll("%lp_suffix%", luckperms ? translateChatColors('&', LuckPermsIntegration.getSuffix(sender)) : "");
+                    .replaceAll("%ftbteam%", isftbteams ? FTBTeamsIntegration.getTeam(sender) : "")
+                    .replaceAll("%lp_group%", isluckperms ? translateChatColors('&', LuckPermsIntegration.getPrimaryGroup(sender)) : "")
+                    .replaceAll("%lp_prefix%", isluckperms ? translateChatColors('&', LuckPermsIntegration.getPrefix(sender)) : "")
+                    .replaceAll("%lp_suffix%", isluckperms ? translateChatColors('&', LuckPermsIntegration.getSuffix(sender)) : "");
             prepareStringMessage = translateChatColors('&', prepareStringMessage);
 
             String stringMessage = prepareStringMessage
