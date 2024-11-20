@@ -98,16 +98,11 @@ public class SimpleChat implements ModInitializer {
             List<ServerPlayerEntity> players = Objects.requireNonNull(sender.getServer(), "The server cannot be null.")
                     .getPlayerManager().getPlayerList();
 
-            // Check if sender is vanished
+
 
 
             for (ServerPlayerEntity p : players) {
-                // Skip if sender is vanished and receiver can't see vanished players
-                //LOGGER.info("VanishAPI.canSeePlayer = "+ VanishAPI.canSeePlayer(p, sender) +" user = "+p.getName().toString());
 
-//                if (isSenderVanished && VanishAPI.canSeePlayer(p, sender)) {
-//                    continue;
-//                }
 
                 if (config.isGlobalChatEnabled()) {
                     if (isGlobalMessage) {
@@ -120,7 +115,6 @@ public class SimpleChat implements ModInitializer {
                         }
                     } else if (p.squaredDistanceTo(sender) <= config.getChatRange() || p.getUuid() == sender.getUuid()) {
                         p.sendMessage(resultMessage, false);
-                        LOGGER.debug(p.squaredDistanceTo(sender)+"/"+config.getChatRange()+ " | "+isGlobalMessage+" | "+resultMessage.toString());
 
                         // Only increment counter if player can see vanished players or sender isn't vanished
                         if (isvanish) {
