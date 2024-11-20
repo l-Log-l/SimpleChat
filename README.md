@@ -10,7 +10,7 @@
 
 _A simple chat mod for your server._
 
-Works even in a single player game.
+Doesn't work in single player.
 
 Just use `!<message>` for global chat or `#<message>` for world chat!
 
@@ -18,6 +18,7 @@ Just use `!<message>` for global chat or `#<message>` for world chat!
 ## Features
 - FTB Teams integration _(no tested)_
 - LuckPerms integration _(tested 5.4)_
+- Vanish integration _(tested 1.5.7)_
 - Global, world and local chat (you can turn it off)
 - Color chat (you can turn it off)
 - Reloading the configuration with the command
