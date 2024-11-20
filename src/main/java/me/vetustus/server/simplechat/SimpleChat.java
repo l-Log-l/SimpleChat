@@ -1,19 +1,15 @@
 package me.vetustus.server.simplechat;
 
 import static me.vetustus.server.simplechat.ChatColor.translateChatColors;
-
+import me.drex.vanish.api.VanishAPI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-
 import java.nio.file.Files;
-
 import java.util.List;
 import java.util.Objects;
-
 import com.google.gson.Gson;
-
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.TextParserUtils;
@@ -21,13 +17,10 @@ import me.vetustus.server.simplechat.integration.FTBTeamsIntegration;
 import me.vetustus.server.simplechat.integration.LuckPermsIntegration;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
-
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.command.CommandManager;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -47,8 +40,14 @@ public class SimpleChat implements ModInitializer {
 
         boolean ftbteams = FabricLoader.getInstance().isModLoaded("ftbteams");
         boolean luckperms = FabricLoader.getInstance().isModLoaded("luckperms");
+        boolean vanish = FabricLoader.getInstance().isModLoaded("melius-vanish");
 
         ServerMessageEvents.ALLOW_CHAT_MESSAGE.register((message, sender, params) -> {
+            if (sender.getServer() != null && sender.getServer().isSingleplayer()) {
+                LOGGER.error("Single mode detected, the mod will be disabled.");
+                return true;
+            }
+
             String originalMessage = message.getContent().getString();
 
             if (!config.isChatModEnabled())
@@ -91,34 +90,63 @@ public class SimpleChat implements ModInitializer {
 
             List<ServerPlayerEntity> players = Objects.requireNonNull(sender.getServer(), "The server cannot be null.")
                     .getPlayerManager().getPlayerList();
+
+            // Check if sender is vanished
+            boolean isSenderVanished = vanish && VanishAPI.isVanished(sender);
+
             for (ServerPlayerEntity p : players) {
+                // Skip if sender is vanished and receiver can't see vanished players
+                if (isSenderVanished && !VanishAPI.canSeePlayer((ServerPlayerEntity)sender, p)) {
+                    continue;
+                }
+
                 if (config.isGlobalChatEnabled()) {
                     if (isGlobalMessage) {
                         p.sendMessage(resultMessage, false);
+                        if (p.squaredDistanceTo(sender) <= config.getChatRange()) {
+                            isPlayerLocalFound++;
+                        }
                     } else if (isWorldMessage && config.isWorldChatEnabled()) {
                         if (p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
                             p.sendMessage(resultMessage, false);
+                            if (p.squaredDistanceTo(sender) <= config.getChatRange()) {
+                                isPlayerLocalFound++;
+                            }
                         }
                     } else if (p.squaredDistanceTo(sender) <= config.getChatRange() || p.getUuid() == sender.getUuid()) {
                         p.sendMessage(resultMessage, false);
                         LOGGER.debug(p.squaredDistanceTo(sender)+"/"+config.getChatRange()+ " | "+isGlobalMessage+" | "+resultMessage.toString());
-                        isPlayerLocalFound++;
+
+                        // Only increment counter if player can see vanished players or sender isn't vanished
+                        if (!isSenderVanished || VanishAPI.canSeePlayer((ServerPlayerEntity)sender, p)) {
+                            isPlayerLocalFound++;
+                        }
                     }
                 } else if (config.isWorldChatEnabled()) {
                     if (isWorldMessage) {
                         if (p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
                             p.sendMessage(resultMessage, false);
+                            if (p.squaredDistanceTo(sender) <= config.getChatRange()) {
+                                isPlayerLocalFound++;
+                            }
                         }
                     } else if (p.squaredDistanceTo(sender) <= config.getChatRange() && p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
                         p.sendMessage(resultMessage, false);
-                        isPlayerLocalFound++;
+                        // Only increment counter if player can see vanished players or sender isn't vanished
+                        if (!isSenderVanished || VanishAPI.canSeePlayer((ServerPlayerEntity)sender, p)) {
+                            isPlayerLocalFound++;
+                        }
                     }
                 } else {
                     p.sendMessage(resultMessage, false);
+                    if (p.squaredDistanceTo(sender) <= config.getChatRange()) {
+                        // Only increment counter if player can see vanished players or sender isn't vanished
+                        if (!isSenderVanished || VanishAPI.canSeePlayer((ServerPlayerEntity)sender, p)) {
+                            isPlayerLocalFound++;
+                        }
+                    }
                 }
             }
-
-
 
             if (isPlayerLocalFound <= 1 && !isGlobalMessage && !isWorldMessage) {
                 String noPlayerNearbyText = config.getNoPlayerNearbyText();

@@ -23,7 +23,7 @@ repositories {
             includeGroup "dev.ftb.mods"
         }
     }
-
+    maven { url "https://api.modrinth.com/maven" }
 
     mavenCentral()
 
@@ -47,6 +47,7 @@ dependencies {
 
     modCompileOnly("net.luckperms:api:${project.luckperms_version}")
 
+    modCompileOnly("maven.modrinth:vanish:${project.vanish_version}")
 }
 
 processResources {
