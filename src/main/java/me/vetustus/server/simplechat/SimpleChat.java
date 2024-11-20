@@ -123,8 +123,10 @@ public class SimpleChat implements ModInitializer {
                         LOGGER.debug(p.squaredDistanceTo(sender)+"/"+config.getChatRange()+ " | "+isGlobalMessage+" | "+resultMessage.toString());
 
                         // Only increment counter if player can see vanished players or sender isn't vanished
-                        if (VanishAPI.canSeePlayer(p, sender)) {
-                            isPlayerLocalFound++;
+                        if (isvanish) {
+                            if (VanishAPI.canSeePlayer(p, sender)) {
+                                isPlayerLocalFound++;
+                            }
                         }
                     }
                 } else if (config.isWorldChatEnabled()) {
@@ -136,19 +138,21 @@ public class SimpleChat implements ModInitializer {
                     } else if (p.squaredDistanceTo(sender) <= config.getChatRange() && p.getEntityWorld().getRegistryKey().getValue() == sender.getEntityWorld().getRegistryKey().getValue()) {
                         p.sendMessage(resultMessage, false);
                         // Only increment counter if player can see vanished players or sender isn't vanished
-                        if (VanishAPI.canSeePlayer(p, sender)) {
-                            isPlayerLocalFound++;
+                        if (isvanish) {
+                            if (VanishAPI.canSeePlayer(p, sender)) {
+                                isPlayerLocalFound++;
+                            }
                         }
                     }
                 } else {
                     p.sendMessage(resultMessage, false);
-                    LOGGER.info("p, sender = "+p.getName().getString()+", "+sender.getName().getString());
-                    LOGGER.info("!isSenderVanished && VanishAPI.canSeePlayer(p, sender) = " + !isSenderVanished +" && "+ VanishAPI.canSeePlayer(p, sender));
                     if (p.squaredDistanceTo(sender) <= config.getChatRange()) {
                         // Only increment counter if player can see vanished players or sender isn't vanished
-                        if (VanishAPI.canSeePlayer(p, sender)) {
+                        if (isvanish) {
+                            if (VanishAPI.canSeePlayer(p, sender)) {
 
-                            isPlayerLocalFound++;
+                                isPlayerLocalFound++;
+                            }
                         }
                     }
                 }
