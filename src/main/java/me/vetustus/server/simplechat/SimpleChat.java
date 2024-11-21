@@ -1,6 +1,10 @@
 package me.vetustus.server.simplechat;
 
 import static me.vetustus.server.simplechat.ChatColor.translateChatColors;
+import static net.minecraft.server.command.CommandManager.literal;
+
+import com.mojang.brigadier.context.CommandContext;
+
 import me.drex.vanish.api.VanishAPI;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,10 +20,14 @@ import eu.pb4.placeholders.api.TextParserUtils;
 import me.drex.vanish.config.ConfigManager;
 import me.vetustus.server.simplechat.integration.FTBTeamsIntegration;
 import me.vetustus.server.simplechat.integration.LuckPermsIntegration;
+import me.vetustus.server.simplechat.permissions.PermissionHandler;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.ClickEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import net.fabricmc.api.ModInitializer;
@@ -27,7 +35,7 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
 public class SimpleChat implements ModInitializer {
-    private ChatConfig config;
+    private static ChatConfig config;
     private static final Logger LOGGER = LogManager.getLogger();
 
     @Override
@@ -93,16 +101,18 @@ public class SimpleChat implements ModInitializer {
 
             Text resultMessage = Placeholders.parseText(TextParserUtils.formatText(stringMessage), PlaceholderContext.of(sender));
 
+            if (!config.getSuggestsWhenYouClickOnThePlayerName().isBlank()) {
+                String stringSuggest = translateChatColors('&', config.getSuggestsWhenYouClickOnThePlayerName()).replaceAll("%player%", sender.getName().getString());
+                Text placeholder_suggest = Placeholders.parseText(TextParserUtils.formatText(stringSuggest), PlaceholderContext.of(sender));
+                resultMessage = Text.literal(resultMessage.getString()).styled(style -> style.withClickEvent(
+                        new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, placeholder_suggest.getString())));
+            }
             int isPlayerLocalFound = 0;
 
             List<ServerPlayerEntity> players = Objects.requireNonNull(sender.getServer(), "The server cannot be null.")
                     .getPlayerManager().getPlayerList();
 
-
-
-
             for (ServerPlayerEntity p : players) {
-
 
                 if (config.isGlobalChatEnabled()) {
                     if (isGlobalMessage) {
@@ -139,6 +149,7 @@ public class SimpleChat implements ModInitializer {
                         }
                     }
                 } else {
+
                     p.sendMessage(resultMessage, false);
                     if (p.squaredDistanceTo(sender) <= config.getChatRange()) {
                         // Only increment counter if player can see vanished players or sender isn't vanished
@@ -154,16 +165,19 @@ public class SimpleChat implements ModInitializer {
 
             if (isPlayerLocalFound <= 1 && !isGlobalMessage && !isWorldMessage && !isSenderVanished) {
                 String noPlayerNearbyText = config.getNoPlayerNearbyText();
-                Text noPlayerNearbyTextResult = Text.literal(translateChatColors('&', noPlayerNearbyText));
-                sender.sendMessage(noPlayerNearbyTextResult, config.noPlayerNearbyActionBar());
+                if (!noPlayerNearbyText.isBlank()) {
+                    Text noPlayerNearbyTextResult = Text.literal(translateChatColors('&', noPlayerNearbyText));
+
+                    sender.sendMessage(noPlayerNearbyTextResult, config.noPlayerNearbyActionBar());
+                }
             }
 
             LOGGER.info(stringMessage);
             return false;
         });
-
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
                 dispatcher.register(CommandManager.literal("simplechat").executes(context -> {
+
                     if (context.getSource().hasPermissionLevel(1)) {
                         try {
                             loadConfig();
@@ -175,9 +189,34 @@ public class SimpleChat implements ModInitializer {
                     } else {
                         context.getSource().sendError(Text.literal("You don't have the right to do this! If you think this is an error, contact your server administrator."));
                     }
+
                     return 1;
                 })));
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            dispatcher.register(literal("simplechat")
+                    .requires(source -> PermissionHandler.hasPermission(source, "simplechat.use", 2))
+                    .then(literal("clear")
+                            .requires(source -> PermissionHandler.hasPermission(source, "simplechat.clear", 2))
+                            .executes(this::spamMessages)));
+        });
     }
+    private int spamMessages(CommandContext<ServerCommandSource> context) {
+        MinecraftServer server = context.getSource().getServer();
+        if (server == null) {
+            context.getSource().sendError(Text.literal("Failed to get server instance!"));
+            return 0;
+        }
+        Text emptyMessage = Text.literal("");
+        List<ServerPlayerEntity> players = Objects.requireNonNull(server, "The server cannot be null.")
+                .getPlayerManager().getPlayerList();
+        for (ServerPlayerEntity p : players) {
+            for (int i = 0; i < 44; i++) {
+                p.sendMessage(emptyMessage, false);
+            }
+        }
+        return 1;
+    }
+
 
     private void loadConfig() throws IOException {
         File configFile = new File(ChatConfig.CONFIG_PATH);

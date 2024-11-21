@@ -8,5 +8,6 @@
   "world_chat_format": "&8[&9W&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%",
   "no_players_nearby_text": "&fNo players nearby. Please use &e!<message> &ffor global chat.",
   "no_players_nearby_action_bar": false,
+  "suggests_when_you_click_on_the_player_name": "/msg %player% ",
   "chat_range": 100
 }

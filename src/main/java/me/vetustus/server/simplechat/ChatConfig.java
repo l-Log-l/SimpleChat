@@ -23,6 +23,8 @@ public class ChatConfig {
     private final String noPlayerNearbyText;
     @SerializedName("no_players_nearby_action_bar")
     private final boolean noPlayerNearbyActionBar;
+    @SerializedName("suggests_when_you_click_on_the_player_name")
+    private final String suggestsWhenYouClickOnThePlayerName;
     @SerializedName("chat_range")
     private final int chatRange;
 
@@ -39,6 +41,7 @@ public class ChatConfig {
         worldChatFormat = "&8[&9W&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%";
         noPlayerNearbyText = "&fNo players nearby. Please use &e!<message> &ffor global chat.";
         noPlayerNearbyActionBar = false;
+        suggestsWhenYouClickOnThePlayerName = "/msg %player:name% ";
         chatRange = 100;
     }
 
@@ -77,6 +80,8 @@ public class ChatConfig {
     public String getNoPlayerNearbyText() {
         return noPlayerNearbyText;
     }
+
+    public String getSuggestsWhenYouClickOnThePlayerName() { return suggestsWhenYouClickOnThePlayerName; }
 
     public String getLocalChatFormat() {
         return localChatFormat;

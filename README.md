@@ -22,6 +22,8 @@ Just use `!<message>` for global chat or `#<message>` for world chat!
 - Global, world and local chat (you can turn it off)
 - Color chat (you can turn it off)
 - Reloading the configuration with the command
+- Command to clear chat history
+- Command or text that suggests when you click on the player's name.
 
 ## Configuration
 The configuration is located in `<game or server directory>/config/simplechat.json`.
@@ -36,6 +38,7 @@ The configuration is located in `<game or server directory>/config/simplechat.js
 | no_players_nearby_text | Defines a message for local chat when there are no players nearby. | String |
 | no_players_nearby_action_bar | Enables (true) or disables (false) action bar message. | boolean |
 | chat_range | Specifies the distance after which local chat messages will not be visible (if global chat is enabled). | int |
+| suggests_when_you_click_on_the_player_name | Command or text that suggests when you click on the player's name. (Support **Placeholder API** and `%player%`) | String |
 
 ```json
 {
@@ -48,6 +51,7 @@ The configuration is located in `<game or server directory>/config/simplechat.js
   "world_chat_format": "&8[&9W&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%",
   "no_players_nearby_text": "&fNo players nearby. Please use &e!<message> &ffor global chat.",
   "no_players_nearby_action_bar": false,
+  "suggests_when_you_click_on_the_player_name": "/msg %player% ",
   "chat_range": 100
 }
 ```
@@ -59,6 +63,10 @@ You can use the placeholder `%player%` to specify the player's nickname and the 
 - `%lp_suffix%` LuckPerms - display player suffix.
 
 You can reload the configuration without restarting the server or the game using the `/simplechat` command (requires [permission level](https://minecraft.fandom.com/wiki/Server.properties#op-permission-level) 1 or more).
+
+## Command
+- `/simplechat` - reload configuration
+- `/simplechat clear` - clear history chat (all players)
 
 ## NO API
 I am removing `me.vetustus.server.simplechat.api.event.PlayerChatCallback` as I didn't see the need for it, and instead of porting it to 1.21, I am using the standard event `net.fabricmc.fabric.api.message.v1.ServerMessageEvents` `ALLOW_CHAT_MESSAGE`.
