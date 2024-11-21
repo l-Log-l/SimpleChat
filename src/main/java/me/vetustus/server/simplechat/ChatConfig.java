@@ -23,19 +23,25 @@ public class ChatConfig {
     private final String noPlayerNearbyText;
     @SerializedName("no_players_nearby_action_bar")
     private final boolean noPlayerNearbyActionBar;
+    @SerializedName("suggests_when_you_click_on_the_player_name")
+    private final String suggestsWhenYouClickOnThePlayerName;
     @SerializedName("chat_range")
     private final int chatRange;
+
+
+
 
     public ChatConfig() {
         isChatModEnabled = true;
         isGlobalChatEnabled = true;
         isWorldChatEnabled = false;
         isChatColorsEnabled = false;
-        localChatFormat = "%player% > &7%message%";
-        globalChatFormat = "%player% > &e%message%";
-        worldChatFormat = "%player% > &b%message%";
+        localChatFormat = "&7%ftbteam%&r%lp_prefix%&r%player%&7:&r &7%message%";
+        globalChatFormat = "&8[&2G&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%";
+        worldChatFormat = "&8[&9W&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%";
         noPlayerNearbyText = "&fNo players nearby. Please use &e!<message> &ffor global chat.";
-        noPlayerNearbyActionBar = true;
+        noPlayerNearbyActionBar = false;
+        suggestsWhenYouClickOnThePlayerName = "/msg %player:name% ";
         chatRange = 100;
     }
 
@@ -71,12 +77,14 @@ public class ChatConfig {
         return worldChatFormat;
     }
 
-
     public String getNoPlayerNearbyText() {
         return noPlayerNearbyText;
     }
 
+    public String getSuggestsWhenYouClickOnThePlayerName() { return suggestsWhenYouClickOnThePlayerName; }
+
     public String getLocalChatFormat() {
         return localChatFormat;
     }
+
 }
