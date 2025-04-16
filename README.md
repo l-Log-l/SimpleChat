@@ -1,6 +1,7 @@
 # SimpleChat (fork++)
 
-![Mod version badge](https://img.shields.io/badge/game_version-1,21-blue)
+![Modrinth downloads badge](https://img.shields.io/modrinth/dt/PXaxqCH3)
+![Modrinth versions badge](https://img.shields.io/modrinth/game-versions/PXaxqCH3)
 ![java 17 badge](https://img.shields.io/badge/java-21+-orange?logo=java)
 
 ### This fork was created because the main project is [no longer maintained](https://github.com/cayennemc/SimpleChat/issues/11).
@@ -9,18 +10,20 @@
 
 _A simple chat mod for your server._
 
-Works even in a single player game.
+Doesn't work in single player.
 
 Just use `!<message>` for global chat or `#<message>` for world chat!
 
-![Example image showing formatted chat messages](https://i.imgur.com/0DPfadW.png)
+![Example image showing formatted chat messages](https://i.imgur.com/aWeZ1DV.png)
 ## Features
 - FTB Teams integration _(no tested)_
 - LuckPerms integration _(tested 5.4)_
+- Vanish integration _(tested 1.5.7)_
 - Global, world and local chat (you can turn it off)
 - Color chat (you can turn it off)
 - Reloading the configuration with the command
-- For developers: Player chat event
+- Command to clear chat history
+- Command or text that suggests when you click on the player's name.
 
 ## Configuration
 The configuration is located in `<game or server directory>/config/simplechat.json`.
@@ -35,6 +38,7 @@ The configuration is located in `<game or server directory>/config/simplechat.js
 | no_players_nearby_text | Defines a message for local chat when there are no players nearby. | String |
 | no_players_nearby_action_bar | Enables (true) or disables (false) action bar message. | boolean |
 | chat_range | Specifies the distance after which local chat messages will not be visible (if global chat is enabled). | int |
+| suggests_when_you_click_on_the_player_name | Command or text that suggests when you click on the player's name. (Support **Placeholder API** and `%player%`) | String |
 
 ```json
 {
@@ -42,11 +46,12 @@ The configuration is located in `<game or server directory>/config/simplechat.js
   "enable_global_chat": true,
   "enable_world_chat": false,
   "enable_chat_colors": false,
-  "local_chat_format": "%player%&7:&r &7%message%",
-  "global_chat_format": "&8[&2G&8] &r%player%&7:&r &e%message%",
-  "world_chat_format": "&8[&9W&8] &r%player%&7:&r &e%message%",
+  "local_chat_format": "&7%ftbteam%&r%lp_prefix%&r%player%&7:&r &7%message%",
+  "global_chat_format": "&8[&2G&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%",
+  "world_chat_format": "&8[&9W&8] &7%ftbteam%&r%lp_prefix%&r%player%&7:&r &e%message%",
   "no_players_nearby_text": "&fNo players nearby. Please use &e!<message> &ffor global chat.",
-  "no_players_nearby_action_bar": true,
+  "no_players_nearby_action_bar": false,
+  "suggests_when_you_click_on_the_player_name": "/msg %player% ",
   "chat_range": 100
 }
 ```
@@ -59,8 +64,12 @@ You can use the placeholder `%player%` to specify the player's nickname and the 
 
 You can reload the configuration without restarting the server or the game using the `/simplechat` command (requires [permission level](https://minecraft.fandom.com/wiki/Server.properties#op-permission-level) 1 or more).
 
+## Command
+- `/simplechat` - reload configuration
+- `/simplechat clear` - clear history chat (all players)
+
 ## NO API
-I am removing [`me.vetustus.server.simplechat.api.event.PlayerChatCallback`](src/main/java/me/vetustus/server/simplechat/api/event/PlayerChatCallback.java) as I didn't see the need for it, and instead of porting it to 1.21, I am using the standard event `net.fabricmc.fabric.api.message.v1.ServerMessageEvents` `ALLOW_CHAT_MESSAGE`.
+I am removing `me.vetustus.server.simplechat.api.event.PlayerChatCallback` as I didn't see the need for it, and instead of porting it to 1.21, I am using the standard event `net.fabricmc.fabric.api.message.v1.ServerMessageEvents` `ALLOW_CHAT_MESSAGE`.
 
 ## License
 The MIT license is used.

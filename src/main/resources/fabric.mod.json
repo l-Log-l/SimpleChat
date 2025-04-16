@@ -9,8 +9,8 @@
     "Log"
   ],
   "contact": {
-    "issues": "https://github.com/rantuhin/SimpleChat/issues",
-    "sources": "https://github.com/rantuhin/SimpleChat"
+    "issues": "https://github.com/l-Log-l/SimpleChat/issues",
+    "sources": "https://github.com/l-Log-l/SimpleChat"
   },
   "license": "MIT",
   "icon": "assets/simplechat/icon.png",
@@ -23,7 +23,7 @@
 
   "depends": {
     "fabricloader": ">=0.16.6",
-    "minecraft": ">=1.21",
+    "minecraft": ">=1.20",
     "java": ">=21",
     "fabric-api": "*"
   }
