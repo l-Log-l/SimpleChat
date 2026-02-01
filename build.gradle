@@ -1,0 +1,75 @@
+plugins {
+    id 'fabric-loom' version '1.14-SNAPSHOT'
+    id 'maven-publish'
+    id 'dev.kikugie.stonecutter'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = "${project.archives_base_name}-${project.minecraft_version}"
+}
+
+// Определяем Java версию для разных версий Minecraft
+def javaVersion = stonecutter.compare(stonecutter.current.version, "1.20.6") >= 0 ? 21 : 17
+
+repositories {
+
+    // Репозиторий Nucleoid
+    maven {
+        url "https://maven.nucleoid.xyz/"
+        name "Nucleoid"
+    }
+
+    maven { url "https://api.modrinth.com/maven" }
+
+    mavenCentral()
+
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // Fabric API. This is technically optional, but you probably want it anyway.
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    // Зависимость для Placeholder API с `include` для включения в сборку
+    // УБРАТЬ include !!!
+    modImplementation("eu.pb4:placeholder-api:${project.placeholder_version}")
+
+
+    modCompileOnly("net.luckperms:api:${project.luckperms_version}")
+
+    modCompileOnly("maven.modrinth:vanish:${project.vanish_version}")
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = javaVersion
+}
+
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+
+    sourceCompatibility = JavaVersion.toVersion(javaVersion)
+    targetCompatibility = JavaVersion.toVersion(javaVersion)
+}
+
+
+jar {
+    from "LICENSE"
+    archiveClassifier = stonecutter.current.version
+}
